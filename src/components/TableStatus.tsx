@@ -79,31 +79,34 @@ export default function TableStatus({ tableNumber, videoTime }: TableStatusProps
           setWaiterData(null);
         }
       } else {
-        // Masa 2 - Gecikme senaryosu
-        if (videoTime >= 8 && videoTime < 70) {
+        // Masa 2 - Gecikme senaryosu (Video 53 saniyede bitiyor)
+        if (videoTime >= 8 && videoTime < 50) {
           setTableData(prev => ({
             ...prev,
             status: 'waiting',
             customer_arrival_time: new Date().toISOString()
           }));
-          
-          // 50 saniye geçtikten sonra gecikme uyarısı
-          if (videoTime >= 58) {
-            setIsLate(true);
-          }
-        } else if (videoTime >= 75 && videoTime < 80) {
-          setWaiterData({
-            id: 2,
-            name: 'Garson B',
-            performance_score: 80
-          });
-        } else if (videoTime >= 80) {
+          setIsLate(false);
+        } else if (videoTime >= 50 && videoTime < 53) {
           setTableData(prev => ({
             ...prev,
-            status: 'served',
-            current_waiter_id: 2,
-            waiter_arrival_time: new Date().toISOString()
+            status: 'waiting',
+            customer_arrival_time: new Date().toISOString()
           }));
+          setIsLate(true); // Gecikme başladı
+        } else if (videoTime >= 53) {
+          // Video bitti, garson hiç gelmedi - masa boş duruma geçiyor
+          setTableData({
+            id: tableNumber,
+            table_number: tableNumber,
+            status: 'empty',
+            current_waiter_id: null,
+            customer_arrival_time: null,
+            waiter_arrival_time: null,
+            total_amount: 0
+          });
+          setWaiterData(null);
+          setIsLate(false);
         }
       }
     };
@@ -134,18 +137,11 @@ export default function TableStatus({ tableNumber, videoTime }: TableStatusProps
       if (videoTime >= 55) return 'Boş';
       return 'Boş';
     } else {
-      switch (tableData.status) {
-        case 'empty':
-          return 'Boş';
-        case 'waiting':
-          return isLate ? 'Bekliyor (GEÇİKME!)' : 'Bekliyor';
-        case 'occupied':
-          return 'Dolu';
-        case 'served':
-          return 'Hizmet Veriliyor';
-        default:
-          return 'Bilinmiyor';
-      }
+      // Masa 2 için özel durum kontrolü
+      if (videoTime >= 8 && videoTime < 50) return 'Bekliyor';
+      if (videoTime >= 50 && videoTime < 53) return 'Bekliyor (GEÇİKME!)';
+      if (videoTime >= 53) return 'Boş'; // Video bitti, garson gelmedi
+      return 'Boş';
     }
   };
 

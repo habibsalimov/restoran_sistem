@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.52.0",
+    "canvas": "^3.1.2",
     "next": "15.4.1",
+    "python-shell": "^5.0.0",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },

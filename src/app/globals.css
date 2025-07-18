@@ -17,3 +17,23 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* YOLO Detection Animations */
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.95); }
+}
+
+.detection-box {
+  animation: fadeInOut 300ms ease-in-out;
+}
+
+@keyframes pulse-detection {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.detection-pulse {
+  animation: pulse-detection 500ms ease-in-out infinite;
+}

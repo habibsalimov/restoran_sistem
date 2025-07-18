@@ -9,6 +9,8 @@ Bu proje, bilgisayarlı görü teknolojileri kullanarak restoran masalarındaki 
 - Masa 1: Normal senaryo
 - Masa 2: Gecikme senaryosu
 - Gerçek zamanlı video kontrolleri
+- **YOLOv8 Object Detection**: Gerçek zamanlı nesne algılama
+- **Etiketsiz Bounding Box**: Hızlı görünüp kaybolan yeşil kutular
 
 ### 📊 Masa Durumu Dashboard
 - 2 masa için anlık durum takibi
@@ -58,29 +60,34 @@ Bu proje, bilgisayarlı görü teknolojileri kullanarak restoran masalarındaki 
 cd my-app
 ```
 
-2. Bağımlılıkları yükleyin:
+2. Node.js bağımlılıklarını yükleyin:
 ```bash
 npm install
 ```
 
-3. Environment değişkenlerini ayarlayın:
+3. Python bağımlılıklarını yükleyin:
+```bash
+pip install -r requirements.txt
+```
+
+4. Environment değişkenlerini ayarlayın:
 ```bash
 # .env.local dosyasını düzenleyin
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-4. Supabase database'i kurun:
+5. Supabase database'i kurun:
 ```bash
 # database/schema.sql dosyasını Supabase'de çalıştırın
 ```
 
-5. Geliştirme sunucusunu başlatın:
+6. Geliştirme sunucusunu başlatın:
 ```bash
 npm run dev
 ```
 
-6. Tarayıcınızda açın: [http://localhost:3000](http://localhost:3000)
+7. Tarayıcınızda açın: [http://localhost:3000](http://localhost:3000)
 
 ## Komutlar
 
@@ -103,23 +110,33 @@ npm run lint
 ```
 src/
 ├── app/
+│   ├── api/
+│   │   └── detect/
+│   │       └── route.ts    # YOLO detection API
 │   ├── layout.tsx          # Root layout
 │   ├── page.tsx            # Ana sayfa
-│   └── globals.css         # Global stiller
+│   └── globals.css         # Global stiller + animations
 ├── components/
 │   ├── DualVideoPlayer.tsx # Dual video player
 │   ├── TableDashboard.tsx  # Masa durumu dashboard
 │   ├── TableStatus.tsx     # Masa durumu bileşeni
 │   ├── WaiterPerformance.tsx # Garson performansı
 │   ├── PricingCalculator.tsx # Fiyatlandırma hesaplayıcı
-│   ├── SimulationControls.tsx # Simülasyon kontrolleri
-│   └── ReportGenerator.tsx  # Rapor sistemi
+│   ├── ReportGenerator.tsx  # Rapor sistemi
+│   ├── VideoPlayer.tsx     # Enhanced video player with YOLO
+│   └── DetectionOverlay.tsx # Bounding box overlay
 ├── lib/
-│   └── supabase.ts         # Supabase client
+│   ├── supabase.ts         # Supabase client
+│   └── detection.ts        # YOLO detection utilities
+├── python/
+│   └── detect.py           # YOLOv8 detection script
+models/
+└── best2.pt                # YOLOv8 model file
 database/
 └── schema.sql              # Database şeması
 docs/
 └── PRD.md                  # Ürün gereksinim belgesi
+requirements.txt            # Python dependencies
 ```
 
 ## Simulasyon Senaryoları

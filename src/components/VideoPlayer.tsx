@@ -1,10 +1,21 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
+import DetectionOverlay from './DetectionOverlay';
+import { captureVideoFrame, detectObjects, scaleDetections } from '@/lib/detection';
 
 interface VideoPlayerProps {
   tableNumber: 1 | 2;
   onTimeUpdate?: (currentTime: number) => void;
+}
+
+interface Detection {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  confidence: number;
+  id: string;
 }
 
 export default function VideoPlayer({ tableNumber, onTimeUpdate }: VideoPlayerProps) {
@@ -12,6 +23,9 @@ export default function VideoPlayer({ tableNumber, onTimeUpdate }: VideoPlayerPr
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [detections, setDetections] = useState<Detection[]>([]);
+  const [videoSize, setVideoSize] = useState({ width: 640, height: 480 });
+  const [isDetecting, setIsDetecting] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -25,6 +39,10 @@ export default function VideoPlayer({ tableNumber, onTimeUpdate }: VideoPlayerPr
 
     const handleLoadedMetadata = () => {
       setDuration(video.duration);
+      setVideoSize({
+        width: video.videoWidth || 640,
+        height: video.videoHeight || 480
+      });
     };
 
     video.addEventListener('timeupdate', handleTimeUpdate);
@@ -35,6 +53,44 @@ export default function VideoPlayer({ tableNumber, onTimeUpdate }: VideoPlayerPr
       video.removeEventListener('loadedmetadata', handleLoadedMetadata);
     };
   }, [onTimeUpdate]);
+
+  const runDetection = useCallback(async () => {
+    const video = videoRef.current;
+    if (!video || !isPlaying || isDetecting) return;
+
+    setIsDetecting(true);
+
+    try {
+      const frameData = captureVideoFrame(video);
+      if (frameData) {
+        const rawDetections = await detectObjects(frameData);
+        
+        // Scale detections to video display size
+        const scaledDetections = scaleDetections(
+          rawDetections,
+          videoSize.width,
+          videoSize.height,
+          video.clientWidth,
+          video.clientHeight
+        );
+
+        setDetections(scaledDetections);
+      }
+    } catch (error) {
+      console.error('Detection error:', error);
+    } finally {
+      setIsDetecting(false);
+    }
+  }, [isPlaying, isDetecting, videoSize]);
+
+  // Run detection periodically when playing
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const interval = setInterval(runDetection, 500); // Every 500ms
+
+    return () => clearInterval(interval);
+  }, [isPlaying, runDetection]);
 
   const togglePlayPause = () => {
     const video = videoRef.current;
@@ -67,8 +123,18 @@ export default function VideoPlayer({ tableNumber, onTimeUpdate }: VideoPlayerPr
           Your browser does not support the video tag.
         </video>
         
+        {/* YOLO Detection Overlay */}
+        <DetectionOverlay
+          detections={detections}
+          videoWidth={videoSize.width}
+          videoHeight={videoSize.height}
+        />
+        
         <div className="absolute top-2 left-2 bg-white bg-opacity-90 text-black px-2 py-1 rounded text-sm border">
           Masa {tableNumber}
+          {isDetecting && (
+            <span className="ml-2 text-green-600">🔍</span>
+          )}
         </div>
       </div>
       

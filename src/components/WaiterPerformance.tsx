@@ -71,9 +71,9 @@ export default function WaiterPerformance({ table1Time, table2Time }: WaiterPerf
           };
         }
       } else if (waiter.id === 2) {
-        // Garson B - Masa 2
-        if (table2Time >= 8 && table2Time < 58) {
-          const responseTime = Math.max(0, 80 - table2Time);
+        // Garson B - Masa 2 (Müşteri bekliyor, garson gelmiyor)
+        if (table2Time >= 8 && table2Time < 50) {
+          const responseTime = Math.max(0, 50 - table2Time);
           
           return {
             ...waiter,
@@ -82,24 +82,24 @@ export default function WaiterPerformance({ table1Time, table2Time }: WaiterPerf
             performance_score: 0, // Henüz puan yok
             late_arrivals: 0
           };
-        } else if (table2Time >= 58 && table2Time < 80) {
-          const responseTime = Math.max(0, 80 - table2Time);
-          
+        } else if (table2Time >= 50 && table2Time < 53) {
+          // Kritik gecikme - müşteri hala bekliyor
           return {
             ...waiter,
             current_table: 2,
-            response_time: responseTime,
-            performance_score: -20, // Gecikme cezası
+            response_time: null,
+            performance_score: -30, // Gecikme cezası
             late_arrivals: 1
           };
-        } else if (table2Time >= 80) {
+        } else if (table2Time >= 53) {
+          // Video bitti, garson hiç gelmedi - çok kötü performans
           return {
             ...waiter,
-            current_table: 2,
-            response_time: 72, // 72 saniye içinde geldi (geç)
-            performance_score: -40, // -20 gecikme -20 müşteri memnuniyetsizliği
+            current_table: null,
+            response_time: null,
+            performance_score: -100, // Maksimum ceza - müşteri terk edildi
             late_arrivals: 1,
-            total_served_tables: 1
+            total_served_tables: 0 // Hizmet verilmedi
           };
         }
       }
@@ -116,6 +116,7 @@ export default function WaiterPerformance({ table1Time, table2Time }: WaiterPerf
     if (score >= 40) return '⚠️';
     if (score > 0) return '📊';
     if (score === 0) return '⏳';
+    if (score <= -50) return '🚫'; // Müşteri terk edildi
     return '❌';
   };
 
@@ -159,6 +160,28 @@ export default function WaiterPerformance({ table1Time, table2Time }: WaiterPerf
                       Yanıt süresi: {Math.ceil(waiter.response_time)}s
                     </div>
                   )}
+                </div>
+              )}
+              
+              {waiter.performance_score <= -50 && (
+                <div className="bg-red-100 border border-red-400 p-3 rounded">
+                  <div className="text-sm font-bold text-red-800">
+                    🚨 KRİTİK UYARI
+                  </div>
+                  <div className="text-xs text-red-700">
+                    Müşteri terk edildi - Garson hiç gelmedi
+                  </div>
+                </div>
+              )}
+              
+              {waiter.performance_score < 0 && waiter.performance_score > -50 && (
+                <div className="bg-yellow-100 border border-yellow-400 p-3 rounded">
+                  <div className="text-sm font-bold text-yellow-800">
+                    ⚠️ PERFORMANS UYARISI
+                  </div>
+                  <div className="text-xs text-yellow-700">
+                    Müşteri bekliyor - Acil müdahale gerekli
+                  </div>
                 </div>
               )}
               
