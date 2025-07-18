@@ -1,36 +1,164 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Restoran Sipariş Takip Sistemi
 
-## Getting Started
+Bu proje, bilgisayarlı görü teknolojileri kullanarak restoran masalarındaki yemek siparişlerini otomatik olarak tanıyan, fiyatlandıran ve garson performansını ölçen web tabanlı demo sistemidir.
 
-First, run the development server:
+## Özellikler
 
+### 🎥 Dual Video Player
+- İki masa için eşzamanlı video oynatma
+- Masa 1: Normal senaryo
+- Masa 2: Gecikme senaryosu
+- Gerçek zamanlı video kontrolleri
+
+### 📊 Masa Durumu Dashboard
+- 2 masa için anlık durum takibi
+- Müşteri gelişi ve garson atama zamanları
+- Masa durumu: Boş, Bekliyor, Hizmet Veriliyor
+- Gecikme uyarıları (1 dakika kuralı)
+
+### 👨‍💼 Garson Performans Takibi
+- Garson A ve Garson B performans skorları
+- Yanıt süresi ölçümü
+- Gecikme sayacı ve performans derecelendirmesi
+- Görsel performans göstergeleri
+
+### 💰 Anlık Fiyatlandırma
+- Yemek kategorileri ve fiyatları:
+  - 🍽️ Ana Yemek: 200 TL
+  - 🍲 Çorba: 90 TL
+  - 🥤 İçecek: 20 TL
+  - 🥗 Salata: 70 TL
+  - 🍰 Tatlı: 100 TL
+- Masa bazlı sipariş takibi
+- Günlük satış özetleri
+
+### 🎛️ Simülasyon Kontrolleri
+- QR kod tanıma simülasyonu
+- Mavi mendil algılama (masa sıfırlama)
+- Manuel test kontrolleri
+
+### 📈 Rapor Sistemi
+- Oturum bazlı detaylı raporlar
+- Garson performans analizi
+- Gelir ve sipariş istatistikleri
+- Günlük özet raporları
+
+## Teknoloji Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Dil**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **Database**: Supabase (kurulum gerekli)
+- **Font**: Geist Sans & Geist Mono
+
+## Kurulum
+
+1. Proje dizinine geçin:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd my-app
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Bağımlılıkları yükleyin:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Environment değişkenlerini ayarlayın:
+```bash
+# .env.local dosyasını düzenleyin
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Supabase database'i kurun:
+```bash
+# database/schema.sql dosyasını Supabase'de çalıştırın
+```
 
-## Learn More
+5. Geliştirme sunucusunu başlatın:
+```bash
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+6. Tarayıcınızda açın: [http://localhost:3000](http://localhost:3000)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Komutlar
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+# Geliştirme sunucusu (Turbopack ile)
+npm run dev
 
-## Deploy on Vercel
+# Production build
+npm run build
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Production sunucusu
+npm start
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Kod kalitesi kontrolü
+npm run lint
+```
+
+## Proje Yapısı
+
+```
+src/
+├── app/
+│   ├── layout.tsx          # Root layout
+│   ├── page.tsx            # Ana sayfa
+│   └── globals.css         # Global stiller
+├── components/
+│   ├── DualVideoPlayer.tsx # Dual video player
+│   ├── TableDashboard.tsx  # Masa durumu dashboard
+│   ├── TableStatus.tsx     # Masa durumu bileşeni
+│   ├── WaiterPerformance.tsx # Garson performansı
+│   ├── PricingCalculator.tsx # Fiyatlandırma hesaplayıcı
+│   ├── SimulationControls.tsx # Simülasyon kontrolleri
+│   └── ReportGenerator.tsx  # Rapor sistemi
+├── lib/
+│   └── supabase.ts         # Supabase client
+database/
+└── schema.sql              # Database şeması
+docs/
+└── PRD.md                  # Ürün gereksinim belgesi
+```
+
+## Simulasyon Senaryoları
+
+### Masa 1 - Hızlı Senaryo
+- 00:10 - 👥 Müşteri gelişi (Sipariş Bekliyor)
+- 00:18 - 👨‍🍳 Garson A atanması (Sipariş Alındı)
+- 00:33 - 🍽️ Yemek servisi (Ana yemek 45 TL + Yan yemek 15 TL + Çorba 25 TL + Yan ürün 8 TL + Su 5 TL = 98 TL)
+- 00:55 - 🧽 Masa sıfırlama (Boş)
+
+### Masa 2 - Gecikme Senaryosu
+- 00:08 - Müşteri gelir
+- 00:58 - 50 saniye kuralı uyarısı
+- 01:15 - Garson QR kodu gösterir (geç)
+- 01:20 - Garson masaya gelir
+- 01:25 - Müşteri memnuniyetsiz
+- 01:30 - Masa sıfırlanır
+
+## Performans Metrikleri
+
+- **Başlangıç puanı**: 100
+- **Zamanında hizmet**: +5 puan
+- **1 dakika gecikme**: -10 puan
+- **2+ dakika gecikme**: -20 puan
+- **Müşteri memnuniyetsizliği**: -15 puan
+
+## Gelecek Geliştirmeler
+
+- [ ] Gerçek video dosyaları entegrasyonu
+- [ ] WebRTC ile canlı video stream
+- [ ] Gerçek bilgisayarlı görü algoritmaları
+- [ ] Kullanıcı yetkilendirme sistemi
+- [ ] Mobil uygulama desteği
+- [ ] Gelişmiş analitik dashboard
+
+## Lisans
+
+Bu proje demo amaçlıdır ve eğitim amaçlı kullanım için tasarlanmıştır.
+
+## Destek
+
+Herhangi bir sorun için lütfen proje dokümantasyonunu inceleyin veya geliştirici ile iletişime geçin.
